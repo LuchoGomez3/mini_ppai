@@ -46,15 +46,16 @@ const encuesta2 = new Encuesta('encuesta2', new Date(2023, 4, 25, 10, 30), [preg
 // ================================================================================
 const llamada1 = new Llamada('descripcionOperador1', 'detalleAccionRequerida2',
     20, 'Encuesta 1', 'Bonita', [respuestaDeEncuesta1, respuestaDeEncuesta2, respuestaDeEncuesta3], [cambioEstado1, cambioEstado2, cambioEstado3], cliente1);
-
-
-
-
+const llamada2 = new Llamada('descripcionOperador1', 'detalleAccionRequerida2',
+    20, 'Encuesta 1', 'Bonita', [respuestaDeEncuesta1, respuestaDeEncuesta3], [cambioEstado1, cambioEstado2], cliente1);
+const llamada3 = new Llamada('descripcionOperador1', 'detalleAccionRequerida2',
+    20, 'Encuesta 2', 'Bonita', [respuestaDeEncuesta1, respuestaDeEncuesta2], [cambioEstado1, cambioEstado3], cliente1);
+const llamada4 = new Llamada('descripcionOperador1', 'detalleAccionRequerida2',
+    20, 'Encuesta 3', 'Bonita', [], [], cliente1);
 
 class GestorConsultarEncuesta {
-    constructor(llamadas, pantalla) {
-        this.llamadas = llamadas
-        this.pantalla = pantalla
+    constructor() {
+        this.llamadas = Llamada.instancias
         let fechaInicio = null
         let fechaFin = null
         let llamadaSeleccionada = null
@@ -73,14 +74,15 @@ class GestorConsultarEncuesta {
         this.tomarSeleccionFechas = function (fechaIni, fechaF) {
             fechaInicio = fechaIni
             fechaFin = fechaF
-            this.buscarLlamadasConEncuestaRespondida(fechaInicio, fechaFin)
+            console.log(fechaInicio, fechaFin)
+            return this.buscarLlamadasConEncuestaRespondida(fechaInicio, fechaFin)
         }
 
         this.buscarLlamadasConEncuestaRespondida = function (fechaInicio, fechaFin) {
             const llamadasConEncuestaRespondida = []
             this.llamadas.forEach(llamada => {
                 if (llamada.esDePeriodo(fechaInicio, fechaFin) && llamada.tieneRespuestas()) {
-                    llamadasConEncuestaRespondida.push(llamada1)
+                    llamadasConEncuestaRespondida.push(llamada)
                 }
             })
             return llamadasConEncuestaRespondida
@@ -90,28 +92,28 @@ class GestorConsultarEncuesta {
 
         this.tomarSeleccionLlamada = function (llamada) {
             llamadaSeleccionada = llamada
-            this.buscarClienteDeLlamada(llamadaSeleccionada)
+            cliente = this.buscarClienteDeLlamada(llamadaSeleccionada)
+            ultimoEstado = this.buscarUltimoEstado(llamadaSeleccionada)
+            duracion = this.buscarDuracion(llamadaSeleccionada)
+            respuestas = this.buscarDatosRespuestaCliente(llamadaSeleccionada)
+            return {cliente: cliente,ultimoEstado: ultimoEstado,duracion: duracion,respuestas: respuestas}
         }
 
         this.buscarClienteDeLlamada = function (llamadaSeleccionada) {
-            cliente = llamadaSeleccionada.getNombreClienteDeLlamada()
-            this.buscarUltimoEstado(llamadaSeleccionada)
+            return llamadaSeleccionada.getNombreClienteDeLlamada()
         }
 
         this.buscarUltimoEstado = function (llamadaSeleccionada) {
-            ultimoEstado = llamadaSeleccionada.determinarUltimoEstado()
-            this.buscarDuracion(llamadaSeleccionada)
+            return llamadaSeleccionada.determinarUltimoEstado()
         }
 
         this.buscarDuracion = function (llamadaSeleccionada) {
-            duracion = llamadaSeleccionada.getDuracion()
-            this.buscarDatosRespuestaCliente(llamadaSeleccionada)
+            return llamadaSeleccionada.getDuracion()
         }
 
         this.buscarDatosRespuestaCliente = function (llamadaSeleccionada) {
-            respuestas = llamadaSeleccionada.getRespuestas()
-            // this.pantalla.solicitarSeleccionFormaGeneracionEncuesta()
-            this.tomarSeleccionFormaGeneracionEncuesta('csv')
+            return llamadaSeleccionada.getRespuestas()
+            // this.pantalla.solicitarSelecwcionFormaGeneracionEncuesta()
         }
 
         this.tomarSeleccionFormaGeneracionEncuesta = function (eleccion) {
@@ -144,4 +146,5 @@ class GestorConsultarEncuesta {
         }
     }
 }
-export default GestorConsultarEncuesta
+const gestor = new GestorConsultarEncuesta()
+export default gestor

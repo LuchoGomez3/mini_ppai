@@ -1,66 +1,68 @@
-import CambioEstado from "./cambiosEstado.js";
-import Estado from "./estado.js";
-
-
 class Llamada {
-    constructor(descripcionOperador, detalleAccionRequerida,
-        duracion, encuestaEnviada, obervacionAuditor, cliente, cambioEstado) {
-            this.operador = descripcionOperador;
-            this.accionRequerida = detalleAccionRequerida;
-            this.duracion = duracion;
-            this.encuestaEnviada = encuestaEnviada;
-            this.obervacionAuditor = obervacionAuditor;
-            this.cliente = cliente
-            this.cambioEstado = [cambioEstado]
-        }
-        getDuracion(){
-            return console.log(this.duracion)
-        }
-        getNombreClienteDeLlamada(){
-            return this.cliente.getNombre()
-        }
-        nuevoCambioEstado(cambioest){
-            this.cambioEstado.push(cambioest)
-        
-        }
-        getEstadoAct(){
+    static instancias = []
 
-           let estAct = this.cambioEstado[(this.cambioEstado.length -1)]
-            return estAct.getNombreEstado()
-        }
+    constructor(descipcionOperador, detalleAccionRequerida, duracion, encuestaEnviada, observacionAuditor, respuestaDeEncuesta, cambioEstado, cliente) {
+        this.descipcionOperador = descipcionOperador
+        this.detalleAccionRequerida = detalleAccionRequerida
+        this.duracion = duracion
+        this.encuestaEnviada = encuestaEnviada
+        this.observacionAuditor = observacionAuditor
+        this.respuestaDeEncuesta = respuestaDeEncuesta
+        this.cambioEstado = cambioEstado
+        this.cliente = cliente
+        Llamada.instancias.push(this)
+    }
 
-        esDePeriodo(inicioPer,finPer){
-           
-            /*hay que validar que la fechaHoraIncio del primer cambio de estado
-              esté entre las fechas InicioPer y FinPer (hay que buscar cual es ese cambio de estado incial)*/ 
+    esDePeriodo(fechaInicio, fechaFin) {
+        return (this.determinarEstadoInicial() >= fechaInicio && this.determinarEstadoInicial() <= fechaFin)
+    }
 
-            let esPer = false
-            let primCamb = this.cambioEstado[0].getFechaHoraInicio()
-            if ((primCamb> inicioPer) && (primCamb < finPer))
-                esPer = true
+    determinarEstadoInicial() {
+        const cambiosEstado = this.cambioEstado.map(cambio => {
+            return cambio.getFechaHoraInicio()
+        })
 
-            return esPer
-        }
+        const fechaMasPequena = new Date(Math.min(...cambiosEstado.map(fecha => fecha.getTime())));
+
+        return fechaMasPequena
+    }
+
+    esDePeriodo(fechaInicio, fechaFin) {
+        return (this.determinarEstadoInicial() >= fechaInicio && this.determinarEstadoInicial() <= fechaFin)
+    }
+
+    tieneRespuestas() {
+        return (this.respuestaDeEncuesta.length != 0)
+    }
+
+    getNombreClienteDeLlamada() {
+        return this.cliente.getNombre()
+    }
+
+    determinarUltimoEstado() {
+        let fechaMasGrande = this.cambioEstado[0].fechaHoraInicio
+        let ultimoEstado = null
+
+        this.cambioEstado.forEach(function (cambio) {
+            if (cambio.fechaHoraInicio.getTime() > fechaMasGrande.getTime()) {
+                fechaMasGrande = cambio.fechaHoraInicio;
+                ultimoEstado = cambio;
+            }
+        });
+        return ultimoEstado.getNombreEstado()
+    }
+
+    getDuracion() {
+        return this.duracion
+    }
+
+    getRespuestas() {
+        // return this.respuestaDeEncuesta.getDescripcionRta()
+        return this.respuestaDeEncuesta.map(respuesta => {
+            return respuesta.getDescripcionRta()
+        })
+    }
+
 }
-
-
-
-//para probar el esDePeriodo
-
-/*const estad = new Estado("ramon")
-const estados = new Estado("rn")
-const esta2 = new Estado("orma")
-const cambEst1 = new CambioEstado(12,estad)
-const cambEst2 = new CambioEstado(8,estados)
-const cambEst3 = new CambioEstado(6, esta2)
-const llamada = new Llamada("a", "a", "b","a", "a", "b",cambEst1 )
-llamada.nuevoCambioEstado(cambEst2)
-llamada.nuevoCambioEstado(cambEst3)
-
-
-let e = llamada.esDePeriodo(14,16)
-
-console.log(e)*/
-
 
 export default Llamada

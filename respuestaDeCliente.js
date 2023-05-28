@@ -1,23 +1,13 @@
-export default class RespuestaDeCliente{
-    constructor(fechaEncuesta, respuestaPosible){
-        this.fechaEncuesta = fechaEncuesta;
-        this.respuestaPosible = respuestaPosible
-
-    }
-    getFechaEncuesta(){
-        return this.fechaEncuesta
-
+class RespuestaCliente {
+    constructor(fechaEncuesta, respuestaSeleccionada) {
+        this.fechaEncuesta = fechaEncuesta
+        this.respuestaSeleccionada = respuestaSeleccionada
     }
 
-    setFechaEncuesta(fecha){
-        this.fechaEncuesta = fecha    
-
-    }
-
-    getDescripcionRta(){
-
-        return this.respuestaPosible.getDescripcion()
-
+    getDescripcionRta() {
+        return this.respuestaSeleccionada.getDescripcionRta()
     }
 
 }
+
+export default RespuestaCliente
